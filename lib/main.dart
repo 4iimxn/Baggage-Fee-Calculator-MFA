@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
@@ -14,23 +15,268 @@ class BaggageApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Baggage Fee Calculator',
       theme: ThemeData(
-        primarySwatch: Colors.indigo,
-        scaffoldBackgroundColor: const Color(0xFFF4F6FA),
         useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFFF4F5FC),
+        fontFamily: GoogleFonts.poppins().fontFamily,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5146E5)),
       ),
-      home: const MainPage(),
+      home: const HomePage(),
     );
   }
 }
 
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+// ==========================================
+// HOME PAGE
+// ==========================================
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF5146E5), Color(0xFF7867F5), Color(0xFF9C8CFF)],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(28),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Welcome Icon
+                  Container(
+                    padding: const EdgeInsets.all(25),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.18),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white30, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.flight_takeoff_rounded,
+                      size: 75,
+                      color: Colors.white,
+                    ),
+                  ),
+
+                  const SizedBox(height: 35),
+
+                  const Text(
+                    'WELCOME ABOARD, TO THE MFA GREATEST BAGGAGE FEE CALCULATOR!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  const Text(
+                    'Your Journey Starts Here',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  const Text(
+                    'Plan your luggage, check your baggage allowance, '
+                    'and calculate any additional baggage fees '
+                    'before your next flight.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                      height: 1.8,
+                    ),
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // Navigate to Calculator
+                  SizedBox(
+                    width: double.infinity,
+                    height: 58,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CalculatorPage(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.calculate_rounded, size: 23),
+                      label: const Text(
+                        'GO TO CALCULATOR',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF5146E5),
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  const Text(
+                    'TRAVEL SMART. PACK SMART.',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      letterSpacing: 2,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _MainPageState extends State<MainPage> {
+// ==========================================
+// NAVIGATION DRAWER
+// ==========================================
+
+class AppDrawer extends StatelessWidget {
+  final String currentPage;
+
+  const AppDrawer({super.key, required this.currentPage});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          Container(
+            height: 190,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF5146E5), Color(0xFF8979F5)],
+              ),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(
+                    Icons.flight_takeoff_rounded,
+                    color: Colors.white,
+                    size: 45,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'MFA GREATEST BAGGAGE FEE CALCULATOR',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Your travel companion',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          ListTile(
+            leading: Icon(
+              Icons.home_rounded,
+              color: currentPage == 'Home'
+                  ? const Color(0xFF5146E5)
+                  : Colors.grey,
+            ),
+            title: const Text('Home'),
+            selected: currentPage == 'Home',
+            selectedTileColor: const Color(0xFFECEBFF),
+            onTap: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false,
+              );
+            },
+          ),
+
+          ListTile(
+            leading: Icon(
+              Icons.calculate_rounded,
+              color: currentPage == 'Calculator'
+                  ? const Color(0xFF5146E5)
+                  : Colors.grey,
+            ),
+            title: const Text('Calculator'),
+            selected: currentPage == 'Calculator',
+            selectedTileColor: const Color(0xFFECEBFF),
+            onTap: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const CalculatorPage()),
+                (route) => false,
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.info_outline_rounded),
+            title: const Text('About'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AboutPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==========================================
+// CALCULATOR PAGE
+// ==========================================
+
+class CalculatorPage extends StatefulWidget {
+  const CalculatorPage({super.key});
+
+  @override
+  State<CalculatorPage> createState() => _CalculatorPageState();
+}
+
+class _CalculatorPageState extends State<CalculatorPage> {
   final TextEditingController weightController = TextEditingController();
 
   final TextEditingController rateController = TextEditingController();
@@ -107,73 +353,32 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Baggage Fee Calculator',
+          'MFA GREATEST BAGGAGE FEE CALCULATOR',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: Colors.indigo,
+        backgroundColor: const Color(0xFF5146E5),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
 
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.indigo),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Icon(Icons.flight_takeoff, color: Colors.white, size: 45),
-                  SizedBox(height: 10),
-                  Text(
-                    'Baggage Calculator',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('About'),
-              onTap: () {
-                Navigator.pop(context);
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AboutPage()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: const AppDrawer(currentPage: 'Calculator'),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(Icons.luggage, size: 65, color: Colors.indigo),
+            const SizedBox(height: 10),
+
+            const Icon(
+              Icons.luggage_rounded,
+              size: 65,
+              color: Color(0xFF5146E5),
+            ),
 
             const SizedBox(height: 10),
 
             const Text(
-              'Excess Baggage Calculator',
+              'Excess Baggage Fee Calculator',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
             ),
@@ -186,9 +391,9 @@ class _MainPageState extends State<MainPage> {
               style: TextStyle(color: Colors.grey),
             ),
 
-            const SizedBox(height: 25),
+            const SizedBox(height: 30),
 
-            // Baggage Weight Input
+            // Baggage Weight
             const Text(
               'Baggage Weight (kg)',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -201,9 +406,12 @@ class _MainPageState extends State<MainPage> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
+              onChanged: (_) {
+                setState(() => calculated = false);
+              },
               decoration: InputDecoration(
                 hintText: 'Enter baggage weight',
-                prefixIcon: const Icon(Icons.scale),
+                prefixIcon: const Icon(Icons.scale_rounded),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -214,7 +422,7 @@ class _MainPageState extends State<MainPage> {
 
             const SizedBox(height: 20),
 
-            // Ticket Class Selection
+            // Ticket Class
             const Text(
               'Ticket Class',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -225,7 +433,7 @@ class _MainPageState extends State<MainPage> {
             DropdownButtonFormField<String>(
               initialValue: ticketClass,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.airplane_ticket),
+                prefixIcon: const Icon(Icons.airplane_ticket_rounded),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -252,7 +460,7 @@ class _MainPageState extends State<MainPage> {
 
             const SizedBox(height: 20),
 
-            // Rate Input
+            // Excess Baggage Rate
             const Text(
               'Excess Baggage Rate (RM/kg)',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -265,9 +473,12 @@ class _MainPageState extends State<MainPage> {
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
+              onChanged: (_) {
+                setState(() => calculated = false);
+              },
               decoration: InputDecoration(
                 hintText: 'Enter rate per kg',
-                prefixIcon: const Icon(Icons.attach_money),
+                prefixIcon: const Icon(Icons.attach_money_rounded),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -281,10 +492,10 @@ class _MainPageState extends State<MainPage> {
             // Calculate Button
             ElevatedButton.icon(
               onPressed: calculateFee,
-              icon: const Icon(Icons.calculate),
+              icon: const Icon(Icons.calculate_rounded),
               label: const Text('Calculate Fee'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigo,
+                backgroundColor: const Color(0xFF5146E5),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.all(16),
                 textStyle: const TextStyle(
@@ -302,9 +513,10 @@ class _MainPageState extends State<MainPage> {
             // Reset Button
             OutlinedButton.icon(
               onPressed: resetCalculator,
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh_rounded),
               label: const Text('Reset'),
               style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF5146E5),
                 padding: const EdgeInsets.all(14),
               ),
             ),
@@ -343,8 +555,15 @@ class _MainPageState extends State<MainPage> {
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.indigo,
-                  borderRadius: BorderRadius.circular(12),
+                  color: const Color(0xFF5146E5),
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF5146E5).withOpacity(0.25),
+                      blurRadius: 12,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
@@ -393,7 +612,9 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
+// ==========================================
 // ABOUT PAGE
+// ==========================================
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -405,22 +626,61 @@ class AboutPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('About', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.indigo,
+        backgroundColor: const Color(0xFF5146E5),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
+
+      drawer: const AppDrawer(currentPage: 'About'),
 
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(25),
-
           child: Column(
             children: [
-              const Icon(Icons.flight_takeoff, size: 90, color: Colors.indigo),
+              // PROFILE IMAGE
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFF5146E5), width: 4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF5146E5).withOpacity(0.2),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: const CircleAvatar(
+                  radius: 65,
+                  backgroundColor: Color(0xFFECEBFF),
+                  backgroundImage: AssetImage('assets/images/faris.jpg'),
+                ),
+              ),
 
               const SizedBox(height: 20),
 
               const Text(
-                'Baggage Fee Calculator',
+                'MUHAMMAD FARIS AIMAN BIN RAIEE',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 5),
+
+              const Text(
+                'Application Developer',
+                style: TextStyle(
+                  color: Color(0xFF5146E5),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              const Text(
+                'MFA Greatest Baggage Fee Calculator',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
@@ -461,7 +721,8 @@ class AboutPage extends StatelessWidget {
                 leading: Icon(Icons.school),
                 title: Text('Course'),
                 subtitle: Text(
-                  'BACHELOR OF COMPUTER SCIENCE (HONS) NETCENTRIC COMPUTING',
+                  'BACHELOR OF COMPUTER SCIENCE '
+                  '(HONS) NETCENTRIC COMPUTING',
                 ),
               ),
 
@@ -482,6 +743,7 @@ class AboutPage extends StatelessWidget {
                     Uri.parse(githubUrl),
                     mode: LaunchMode.externalApplication,
                   );
+
                   if (!launched && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -490,19 +752,21 @@ class AboutPage extends StatelessWidget {
                     );
                   }
                 },
-                child: Text(
+                child: const Text(
                   githubUrl,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.blue,
                     decoration: TextDecoration.underline,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               ),
 
               const SizedBox(height: 15),
 
               const Text(
-                '© 2026 Baggage Fee Calculator. '
+                '© 2026 MFA Greatest Baggage Fee Calculator. '
+                'ICT602 INDIVIDUAL ASSIGNMENT. '
                 'All Rights Reserved.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey, fontSize: 12),
