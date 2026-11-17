@@ -51,7 +51,6 @@ class HomePage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Welcome Icon
                   Container(
                     padding: const EdgeInsets.all(25),
                     decoration: BoxDecoration(
@@ -69,7 +68,7 @@ class HomePage extends StatelessWidget {
                   const SizedBox(height: 35),
 
                   const Text(
-                    'WELCOME ABOARD, TO THE MFA GREATEST BAGGAGE FEE CALCULATOR!',
+                    'WELCOME ABOARD!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
@@ -106,7 +105,6 @@ class HomePage extends StatelessWidget {
 
                   const SizedBox(height: 40),
 
-                  // Navigate to Calculator
                   SizedBox(
                     width: double.infinity,
                     height: 58,
@@ -195,7 +193,7 @@ class AppDrawer extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'MFA GREATEST BAGGAGE FEE CALCULATOR',
+                    'Baggage Calculator',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -252,10 +250,13 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.info_outline_rounded),
             title: const Text('About'),
+            selected: currentPage == 'About',
+            selectedTileColor: const Color(0xFFECEBFF),
             onTap: () {
-              Navigator.push(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const AboutPage()),
+                (route) => false,
               );
             },
           ),
@@ -279,8 +280,6 @@ class CalculatorPage extends StatefulWidget {
 class _CalculatorPageState extends State<CalculatorPage> {
   final TextEditingController weightController = TextEditingController();
 
-  final TextEditingController rateController = TextEditingController();
-
   String ticketClass = 'Economy';
 
   double excessWeight = 0;
@@ -290,32 +289,38 @@ class _CalculatorPageState extends State<CalculatorPage> {
 
   bool calculated = false;
 
+  // Automatically determine rate based on ticket class.
+  double get baggageRate {
+    return ticketClass == 'Economy' ? 15.0 : 12.0;
+  }
+
+  // Automatically determine baggage allowance.
+  double get baggageAllowance {
+    return ticketClass == 'Economy' ? 20.0 : 40.0;
+  }
+
   void calculateFee() {
     double? baggageWeight = double.tryParse(weightController.text);
 
-    double? rate = double.tryParse(rateController.text);
-
     if (baggageWeight == null ||
-        rate == null ||
         baggageWeight < 0 ||
-        rate < 0 ||
-        weightController.text.isEmpty ||
-        rateController.text.isEmpty) {
+        weightController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter valid baggage weight and rate.'),
+          content: Text('Please enter a valid baggage weight.'),
           backgroundColor: Colors.red,
         ),
       );
       return;
     }
 
-    double allowance = ticketClass == 'Economy' ? 20 : 40;
-
     setState(() {
-      excessWeight = baggageWeight > allowance ? baggageWeight - allowance : 0;
+      excessWeight = baggageWeight > baggageAllowance
+          ? baggageWeight - baggageAllowance
+          : 0;
 
-      excessCharge = excessWeight * rate;
+      // Automatically use the rate for the selected class.
+      excessCharge = excessWeight * baggageRate;
 
       serviceTax = excessCharge * 0.08;
 
@@ -323,12 +328,13 @@ class _CalculatorPageState extends State<CalculatorPage> {
 
       calculated = true;
     });
+
+    FocusScope.of(context).unfocus();
   }
 
   void resetCalculator() {
     setState(() {
       weightController.clear();
-      rateController.clear();
 
       ticketClass = 'Economy';
 
@@ -344,7 +350,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
   @override
   void dispose() {
     weightController.dispose();
-    rateController.dispose();
     super.dispose();
   }
 
@@ -353,7 +358,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'MFA GREATEST BAGGAGE FEE CALCULATOR',
+          'Baggage Calculator',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: const Color(0xFF5146E5),
@@ -460,30 +465,57 @@ class _CalculatorPageState extends State<CalculatorPage> {
 
             const SizedBox(height: 20),
 
-            // Excess Baggage Rate
+            // AUTOMATIC EXCESS BAGGAGE RATE
             const Text(
-              'Excess Baggage Rate (RM/kg)',
+              'Excess Baggage Rate',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 8),
 
-            TextField(
-              controller: rateController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              onChanged: (_) {
-                setState(() => calculated = false);
-              },
-              decoration: InputDecoration(
-                hintText: 'Enter rate per kg',
-                prefixIcon: const Icon(Icons.attach_money_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
+              decoration: BoxDecoration(
+                color: const Color(0xFFECEBFF),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFF5146E5).withOpacity(0.3),
                 ),
-                filled: true,
-                fillColor: Colors.white,
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.payments_rounded, color: Color(0xFF5146E5)),
+
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Automatically Applied Rate',
+                          style: TextStyle(color: Colors.grey, fontSize: 11),
+                        ),
+
+                        const SizedBox(height: 3),
+
+                        Text(
+                          'RM ${baggageRate.toStringAsFixed(2)} / kg',
+                          style: const TextStyle(
+                            color: Color(0xFF5146E5),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: Color(0xFF5146E5),
+                  ),
+                ],
               ),
             ),
 
@@ -535,10 +567,19 @@ class _CalculatorPageState extends State<CalculatorPage> {
 
               const SizedBox(height: 15),
 
+              resultRow('Ticket Class', ticketClass),
+
+              resultRow(
+                'Baggage Allowance',
+                '${baggageAllowance.toStringAsFixed(0)} kg',
+              ),
+
               resultRow(
                 'Excess Baggage Weight',
                 '${excessWeight.toStringAsFixed(2)} kg',
               ),
+
+              resultRow('Rate per kg', 'RM ${baggageRate.toStringAsFixed(2)}'),
 
               resultRow(
                 'Excess Baggage Charge',
@@ -588,6 +629,18 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   ],
                 ),
               ),
+
+              if (excessWeight == 0) ...[
+                const SizedBox(height: 15),
+                const Text(
+                  'Your baggage is within the allowed limit!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ],
           ],
         ),
@@ -602,6 +655,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(child: Text(title, style: const TextStyle(fontSize: 14))),
+          const SizedBox(width: 10),
           Text(
             value,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -669,7 +723,7 @@ class AboutPage extends StatelessWidget {
               const SizedBox(height: 5),
 
               const Text(
-                'Application Developer',
+                'Student Developer',
                 style: TextStyle(
                   color: Color(0xFF5146E5),
                   fontSize: 14,
@@ -678,6 +732,14 @@ class AboutPage extends StatelessWidget {
               ),
 
               const SizedBox(height: 25),
+
+              const Icon(
+                Icons.flight_takeoff_rounded,
+                size: 65,
+                color: Color(0xFF5146E5),
+              ),
+
+              const SizedBox(height: 20),
 
               const Text(
                 'MFA Greatest Baggage Fee Calculator',
